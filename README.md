@@ -7,7 +7,7 @@
 | Membre                | Github                                             |
 |-----------------------|----------------------------------------------------|
 | Ewen BOUQUET          | [@iFairPlay22](https://github.com/iFairPlay22)     |
-| Matthias JOUEN        | [@Maja2308](https://github.com/Maja2308)           |
+| Matthias JOUEN        | [@MatthiasJouen](https://github.com/MatthiasJouen)           |
 | Alexandre JOUDIOUX    | [@Vitrox77](https://github.com/Vitrox77)           |
 | Guillaume DAVY        | [@GuillaumeDavy](https://github.com/GuillaumeDavy) |
 
