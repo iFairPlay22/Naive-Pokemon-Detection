@@ -1,15 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
 import os
 from imageio import imread
 from difflib import SequenceMatcher
+import pandas as pd
 
-images_max_nb = 1000
-images_dir = './images'
+images_dir = './assets/images'
 images_ext = ['jpg', 'jpeg', 'png']
+
+images_max_learn_nb = 1000
+images_max_test_nb = 1000
 
 # Cf printSimilarPokemonNames()
 pokemons_manual_associations = {
@@ -19,7 +23,7 @@ pokemons_manual_associations = {
 
 """ TRAITEMENT PRINCIPAL """
 
-def getPokemonDataset():
+def getLearningDataset():
     pokemonDataset = {}
 
     datasets = ['CompletePokemonImageDataset', 'PokemonGenerationOne']
@@ -30,7 +34,7 @@ def getPokemonDataset():
             for path in paths:
                 for gl in glob.glob(os.path.join(path)):
 
-                    if i == images_max_nb:
+                    if i == images_max_learn_nb:
                         return pokemonDataset
                     i += 1
 
@@ -47,6 +51,62 @@ def getPokemonDataset():
 
     return pokemonDataset
 
+def learn(learningDataset):
+    pass
+
+def predictPokemon(image):
+    return "Pikachu"
+
+def getTestingDataset():
+    csv = pd.read_csv(
+        './assets/csv/pokedex.csv',
+        names=['pokemon_name', 'pokedex_number']
+    )
+    print(csv)
+    return {}
+
+    pokemonDataset = {}
+
+    i = 0
+    for ext in images_ext:
+        paths = [images_dir + '/OneShotPokemon/data/shapes/*.' + ext]
+        for path in paths:
+            for gl in glob.glob(os.path.join(path)):
+
+                if i == images_max_test_nb:
+                    return pokemonDataset
+                i += 1
+
+                pokemonName = gl.split('\\')[1]
+                if (pokemonName in pokemons_manual_associations):
+                    pokemonName = pokemons_manual_associations[pokemonName]
+
+                pokemonImg = imread(gl)
+
+                if pokemonName in pokemonDataset:
+                    pokemonDataset[pokemonName].append(pokemonImg)
+                else:
+                    pokemonDataset[pokemonName] = [pokemonImg]
+
+    return pokemonDataset
+
+def makeTests(testDataset):
+
+    (success, error)  = (0, 0)
+    for testResult, testEntries in testDataset:
+        predictedResult = predict(testEntries)
+        if (testResult == predictedResult):
+            sucess += 1
+        else:
+            error += 1
+
+    if (success + error != 0):
+        print("Success rate : ", success / (success + error))
+    else:
+        print("No test launched...")
+
+    print("Success : ", success)
+    print("Error   : ", error)
 
 """ DEBUG """
 
@@ -86,6 +146,12 @@ def printSimilarPokemonNames():
 
 if __name__ == '__main__':
 
-    pokemonDataset = getPokemonDataset()
+    # learningDataset = getLearningDataset()
+
+    # learn(learningDataset)
+
+    testDataset = getTestingDataset()
+    
+    # makeTests(testDataset)
 
     # printSimilarPokemonNames()
