@@ -12,72 +12,117 @@ import re
 import random
 import tqdm
 
+pokedex_path = './assets/csv/pokedex.csv'
 images_dir = './assets/images'
 images_ext = ['jpg', 'jpeg', 'png']
 
-images_max_learn_nb = 10
-images_max_test_nb  = 10000000
+images_max_learn_nb = 10000000
+images_max_test_nb = 10000000
 
 pokemons_manual_associations = {
-    # "MrMime"     :  "Mr. Mime"
+    "MrMime":  "Mr. Mime"
 }
 
-display_names_associations     = True
-display_max_number_reached     = True
+display_names_associations = True
+display_max_number_reached = True
 display_unknowned_pokemon_name = True
-display_unreachable_file_name  = True
-display_detailed_results       = False
+display_unreachable_file_name = True
+display_detailed_results = True
 
 global pokedex
 
 """ TRAITEMENT PRINCIPAL """
 
+""" 
+    Sortie  : 
+        - dict pokedex ;
+
+    Description :
+        Création d'un dictionnaire qui prends en entrée le nom d'un 
+        pokemon et retourne son id 
+"""
+
+
 def getPokedex():
-    
+
     print()
     print("<========== LOADING POKEDEX ==========>")
     print()
 
     file = pd.read_csv(
-        './assets/csv/pokedex.csv',
-        usecols=[ 'pokedex_number', 'name' ]
+        pokedex_path,
+        usecols=['pokedex_number', 'name']
     )
-    
+
     N = len(file)
     pokedex = dict()
     for i in range(N):
         pokedex[file['name'][i]] = file['pokedex_number'][i]
 
     print(str(N) + " pokemons loaded!")
-    
+
     print()
     print("<=====================================>")
     print()
-    
+
     return pokedex
+
+
+"""
+    Entrées : 
+    - string a (de taille n) ; 
+    - string b (de taille m) ;
+    (on peut avoir n != m)
+
+    Sortie  : 
+    - float ratio ;
+
+    Description :
+        Retourne le ratio de similarité maximum (entre 0 et 1) 
+        entre les deux string de taille min(n, m).
+"""
+
 
 def getMaxReliableStringRatio(a, b):
     lenA = len(a)
     lenB = len(b)
 
+    # On fait en sorte que len(a) <= len(b)
     if lenA > lenB:
         (a, b) = (b, a)
         (lenA, lenB) = (lenB, lenA)
 
-    if (a in b or b in a):
+    # On considère le ratio comme 1 si il y a une inclusion de a dans b
+    if (a in b):
         return 1.0
 
-    return max([ 
-        SequenceMatcher(None, a, b[i:i+lenA]).ratio() 
-        for i in range(lenB - lenA + 1) 
+    # On compare chaque sous chaine de b de taille a, avec a et on
+    # retourne le ratio le plus élevé
+    return max([
+        SequenceMatcher(None, a, b[i:i+lenA]).ratio()
+        for i in range(lenB - lenA + 1)
     ])
 
+
+""" 
+    Sortie  : 
+    - dict learningDataset ;
+
+    Description :
+        Retourne un dictionnaire associant pour chaque id de pokémon,
+        un liste d'images issues des datasets "CompletePokemonImageDataset" 
+        et "PokemonGenerationOne". Une image est en fait représentée par
+        une matrice de pixels.
+"""
+
+
 def getLearningDataset():
-    
+
     print("<====== LOADING LEARNING DATASET =====>")
     print()
 
-    # Get all images
+    # On récupère l'ensemble des images de pokemons contenues dans
+    # les datasets "CompletePokemonImageDataset" et "PokemonGenerationOne"
     globs = []
     datasets = ['CompletePokemonImageDataset', 'PokemonGenerationOne']
     for dataset in datasets:
@@ -85,52 +130,69 @@ def getLearningDataset():
             paths = [images_dir + '/' + dataset + '/data/shapes/*/*.' + ext]
             for path in paths:
                 globs += glob.glob(os.path.join(path))
-    
-    # Associates images to pokemons
+
+    # Initialisation des variables
     pokedexKeys = pokedex.keys()
     pokemonDataset = {}
     replaced = {}
     unknowned = {}
 
+    # Pour chaque image des datasets (max : images_max_learn_nb)
     for i in tqdm.tqdm(range(min(len(globs), images_max_learn_nb))):
         gl = globs[i]
 
-        # Get the pokemon id
+        # On récupère le nom du pokemon (nom du sous dossier)
         pokemonName = gl.split('\\')[1]
+
+        # On récupère l'id du pokemon à partir de son nom
         if (pokemonName in pokemons_manual_associations):
             pokemonName = pokemons_manual_associations[pokemonName]
 
+        # Si le nom du pokemon ne correspond pas au nom de pokémon inscrit
+        # dans le pokedex, on essaye de l'associer au mieux
         if not(pokemonName in pokedex):
             if not(pokemonName in unknowned.keys()):
-                similarPokemonName = max(pokedexKeys, key = lambda x : getMaxReliableStringRatio(pokemonName, x))
-                ratio = getMaxReliableStringRatio(pokemonName, similarPokemonName)
 
+                # On récupère le nom du pokemon du pokedex ressemblant le plus
+                # à celui acuel, ainsi que son ratio de ressemblance
+                similarPokemonName = max(
+                    pokedexKeys, key=lambda x: getMaxReliableStringRatio(pokemonName, x))
+                ratio = getMaxReliableStringRatio(
+                    pokemonName, similarPokemonName)
+
+                # Si le nom est ressemblant à plus de 70%, on considère que
+                # l'association est faite
                 if (0.7 <= ratio):
 
                     if not(pokemonName in replaced.keys()):
-                        replaced[pokemonName] = "INFOS => The pokemon \"" + pokemonName + "\" has been classified as \"" + similarPokemonName + "\" in the pokedex"
-                    
+                        replaced[pokemonName] = "INFOS => The pokemon \"" + pokemonName + \
+                            "\" has been classified as \"" + similarPokemonName + "\" in the pokedex"
+
                     pokemonName = similarPokemonName
 
                 else:
-                    unknowned[pokemonName] = "WARNING => Impossible to find the pokemon id of the name \"" + pokemonName + "\" in the pokedex"
+                    unknowned[pokemonName] = "WARNING => Impossible to find the pokemon id of the name \"" + \
+                        pokemonName + "\" in the pokedex"
                     continue
             else:
                 continue
-        
+
         pokemonId = pokedex[pokemonName]
 
-        # Get the pokemon image
-        pokemonImg = None # imread(gl)
+        # On charge la matrice de pixels de l'image
+        pokemonImg = None  # imread(gl)
+
+        # On ajoute les données dans le dictionnaire
         if pokemonId in pokemonDataset:
             pokemonDataset[pokemonId].append(pokemonImg)
         else:
             pokemonDataset[pokemonId] = [pokemonImg]
 
-    # Check if max number of images reached
+    # Gestion de l'affichage sur la console
     if display_max_number_reached and i == images_max_learn_nb - 1:
         print()
-        print("WARNING => Max images number reached ({}).".format(images_max_learn_nb))
+        print("WARNING => Max images number reached ({}).".format(
+            images_max_learn_nb))
 
     if display_names_associations and len(replaced) != 0:
         print()
@@ -149,7 +211,18 @@ def getLearningDataset():
     print("<=====================================>")
     print()
 
+    # On renvoie les données
     return pokemonDataset
+
+
+""" 
+    Entrée  : 
+    - dict learningDataset ;
+
+    Description :
+        Phase d'apprentissage de l'IA.
+"""
+
 
 def learn(learningDataset):
 
@@ -158,57 +231,90 @@ def learn(learningDataset):
     print()
 
     print("AI is ready!")
-    
+
     print()
     print("<=====================================>")
     print()
 
+
+""" 
+    Sortie  : 
+    - mat image ;
+
+    Sortie  : 
+    - int pokedexId ;
+
+    Description :
+        Analyse la matrice de pixels de l'image envoyée en paramètres
+        et renvoie l'id du pokemon identifié dans l'image.
+"""
+
+
 def makePrediction(image):
     return random.randint(0, len(pokedex))
+
+
+""" 
+    Sortie  : 
+    - dict testingDataset ;
+
+    Description :
+        Retourne un dictionnaire associant pour chaque id de pokémon,
+        un liste d'images issues du dataset "OneShotPokemon". Une 
+        image est en fait représentée par une matrice de pixels.
+"""
+
 
 def getTestingDataset():
 
     print()
     print("<====== LOADING TESTING DATASET ======>")
     print()
-    
-    # Get all images
+
+    # On récupère l'ensemble des images de pokemons contenues dans
+    # le dataset "OneShotPokemon"
     globs = []
     for ext in images_ext:
         paths = [images_dir + '/OneShotPokemon/data/shapes/*.' + ext]
         for path in paths:
             globs += glob.glob(os.path.join(path))
-                
-    # Associates images to pokemons
+
+    # Initialisation des variables
     pokemonDataset = {}
     pokemonIds = pokedex.values()
     unreachabled = []
     unknowned = {}
+
+    # Pour chaque image du dataset (max : images_max_test_nb)
     for i in tqdm.tqdm(range(min(len(globs), images_max_test_nb))):
         gl = globs[i]
 
-        # Get the pokemon id
+        # On récupère l'id du pokemon (dans le nom de fichier)
         fileName = gl.split('\\')[1]
         intFounds = re.findall('\d+', fileName)
-
         if (len(intFounds) == 0):
-            unreachabled.append("WARNING => No id found in the file name \"" + fileName + "\" (no integer found)")
+            unreachabled.append(
+                "WARNING => No id found in the file name \"" + fileName + "\" (no integer found)")
             continue
-                            
         pokemonId = int(intFounds[0])
+
+        # On traite uniquement les pokemons ayant un id contenu dans le pokedex
         if not(pokemonId in pokemonIds):
             if not(pokemonId in unknowned.keys()):
-                unknowned[pokemonId] = "WARNING => The pokemon id \"" + str(pokemonId) + "\" is not in the pokedex"
+                unknowned[pokemonId] = "WARNING => The pokemon id \"" + \
+                    str(pokemonId) + "\" is not in the pokedex"
             continue
 
-        # Get the pokemon image
-        pokemonImg = None # imread(gl)
+        # On charge la matrice de pixels de l'image
+        pokemonImg = None  # imread(gl)
+
+        # On ajoute les données dans le dictionnaire
         if pokemonId in pokemonDataset:
             pokemonDataset[pokemonId].append(pokemonImg)
         else:
             pokemonDataset[pokemonId] = [pokemonImg]
-        
-    # Check if max number of images reached
+
+    # Gestion de l'affichage sur la console
     if display_max_number_reached and i == images_max_test_nb - 1:
         print()
         print("WARNING => Max images number reached ({}).".format(images_max_test_nb))
@@ -230,7 +336,19 @@ def getTestingDataset():
     print("<=====================================>")
     print()
 
+    # On renvoie les données
     return pokemonDataset
+
+
+""" 
+    Sortie  : 
+    - dict testingDataset ;
+
+    Description :
+        Pour chaque image de test, on compare le résultat attendu avec la
+        prédiction effectue par notre IA, et on affiche les résultat associés.
+"""
+
 
 def makeTests(testDataset):
 
@@ -238,26 +356,33 @@ def makeTests(testDataset):
     print("<======== MAKE AUTOMATIC TESTS =======>")
     print()
 
+    # Pour chaque image de test
     results = {}
-    (success, error)  = (0, 0)
+    (success, error) = (0, 0)
     for testResult, testEntries in tqdm.tqdm(testDataset.items()):
-        predictedResult = makePrediction(testEntries)
+        for testEntry in testEntries:
 
-        if not(testResult in results):
-            results[testResult] = {
-                'success' : 0,
-                'error' : 0
-            }
+            # On prédit l'id du pokemon par rapport à l'image
+            predictedResult = makePrediction(testEntry)
 
-        if (testResult == predictedResult):
-            success += 1
-            results[testResult]['success'] += 1
-        else:
-            error += 1
-            results[testResult]['error'] += 1
-        
-        results[testResult]['avg'] = results[testResult]['success'] / (results[testResult]['success'] +  results[testResult]['error'])
+            if not(testResult in results):
+                results[testResult] = {
+                    'success': 0,
+                    'error': 0
+                }
 
+            # On compare l'id prédit avec l'id attendu
+            if (testResult == predictedResult):
+                success += 1
+                results[testResult]['success'] += 1
+            else:
+                error += 1
+                results[testResult]['error'] += 1
+
+            results[testResult]['avg'] = results[testResult]['success'] / \
+                (results[testResult]['success'] + results[testResult]['error'])
+
+    # On affiche les résultats de traitement
     total = success + error
     if (total != 0):
         print()
@@ -265,9 +390,9 @@ def makeTests(testDataset):
         print()
 
         rate = success / total
-        print("Total success rate : {0:.2f}%".format(rate)) 
+        print("Total success rate : {0:.2f}%".format(rate))
 
-        ratesByPokemon = map(lambda x : x['avg'], results.values())
+        ratesByPokemon = map(lambda x: x['avg'], results.values())
         rate = sum(ratesByPokemon) / len(results)
         print("Success rate by pokemon : {0:.2f}%".format(rate))
     else:
@@ -276,21 +401,27 @@ def makeTests(testDataset):
     print("Success : ", success)
     print("Error   : ", error)
 
+    # Gestion de l'affichage sur la console
     if display_detailed_results:
         print()
         for pokemonName in sorted(results.keys()):
-            print("INFO => \"{:03d}\" prediction rate = {:.2f}%".format(pokemonName, results[pokemonName]['avg']))       
+            print("INFO => \"{:03d}\" prediction rate = {:.2f}%".format(
+                pokemonName, results[pokemonName]['avg']))
 
     print()
     print("<=====================================>")
     print()
 
+
 if __name__ == '__main__':
 
+    # On charge le pokédex
     pokedex = getPokedex()
 
+    # On entraîne notre IA à partir des données d'apprentissage
     learningDataset = getLearningDataset()
     learn(learningDataset)
 
+    # On teste notre IA à partir des données de test
     testDataset = getTestingDataset()
     makeTests(testDataset)
