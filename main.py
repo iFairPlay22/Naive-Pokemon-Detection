@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from operator import le
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
@@ -11,13 +12,14 @@ import pandas as pd
 import re
 import random
 import tqdm
+from ai import *
 
 pokedex_path = './assets/csv/pokedex.csv'
 images_dir = './assets/images'
 images_ext = ['jpg', 'jpeg', 'png']
 
-images_max_learn_nb = 10000000
-images_max_test_nb = 10000000
+images_max_learn_nb = 5000
+images_max_test_nb = 1
 
 pokemons_manual_associations = {
     "MrMime":  "Mr. Mime"
@@ -29,7 +31,7 @@ display_unknowned_pokemon_name = True
 display_unreachable_file_name = True
 display_detailed_results = True
 
-global pokedex
+global pokedex, pokemonAi
 
 """ TRAITEMENT PRINCIPAL """
 
@@ -180,7 +182,7 @@ def getLearningDataset():
         pokemonId = pokedex[pokemonName]
 
         # On charge la matrice de pixels de l'image
-        pokemonImg = None  # imread(gl)
+        pokemonImg = imread(gl)
 
         # On ajoute les données dans le dictionnaire
         if pokemonId in pokemonDataset:
@@ -219,6 +221,9 @@ def getLearningDataset():
     Entrée  : 
     - dict learningDataset ;
 
+    Sortie  : 
+    -  ImageAnalysor pokemonAi ;
+
     Description :
         Phase d'apprentissage de l'IA.
 """
@@ -230,11 +235,15 @@ def learn(learningDataset):
     print("<============== LEARNING =============>")
     print()
 
+    ai = ImageAnalysor(learningDataset)
+
     print("AI is ready!")
 
     print()
     print("<=====================================>")
     print()
+
+    return ai
 
 
 """ 
@@ -251,7 +260,7 @@ def learn(learningDataset):
 
 
 def makePrediction(image):
-    return random.randint(0, len(pokedex))
+    return pokemonAi.getSimilarImageId(image)
 
 
 """ 
@@ -306,7 +315,7 @@ def getTestingDataset():
             continue
 
         # On charge la matrice de pixels de l'image
-        pokemonImg = None  # imread(gl)
+        pokemonImg = imread(gl)
 
         # On ajoute les données dans le dictionnaire
         if pokemonId in pokemonDataset:
@@ -420,7 +429,7 @@ if __name__ == '__main__':
 
     # On entraîne notre IA à partir des données d'apprentissage
     learningDataset = getLearningDataset()
-    learn(learningDataset)
+    pokemonAi = learn(learningDataset)
 
     # On teste notre IA à partir des données de test
     testDataset = getTestingDataset()
