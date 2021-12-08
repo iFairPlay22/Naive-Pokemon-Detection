@@ -9,8 +9,8 @@ if __name__ == '__main__':
 
     # Inititalisation
     constantManager = ConstantsManager()
-    aiManager = AiManager(constantManager)
     dataManager = DataManager(constantManager)
+    aiManager = AiManager(constantManager, dataManager)
 
     # On lance l'apprentissage
     aiManager.learn(dataManager.getLearningDataset())

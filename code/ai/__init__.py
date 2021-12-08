@@ -14,8 +14,10 @@ class AiManager(object):
         est dans une image, à partir d'une analyse de son histogramme de couleurs.
     """
 
-    def __init__(self, consts):
+    def __init__(self, consts, dataManager):
         self._consts = consts
+        self._pokedex = dataManager.getPokedex()
+        self._reversedPokedex = dataManager.getReversedPokedex()
 
     """ 
         Entrée  : 
@@ -30,7 +32,7 @@ class AiManager(object):
     def learn(self, learningDataset):
 
         print()
-        print("<========== LOADING POKEDEX ==========>")
+        print("<=========== LEARNING DATA ===========>")
         print()
 
         self._ids = []
@@ -40,7 +42,8 @@ class AiManager(object):
                 self._ids.append(pokemonId)
                 self._imgs.append(pokemonImage)
 
-        self._kms = self._getKMeans(self._getRandomRgbPixels())
+        self._kms = self._getKMeans(
+            len(learningDataset.keys()), self._getRandomRgbPixels())
 
         self._histograms = np.zeros(
             (len(self._imgs), self._kms.n_clusters), dtype=np.float32)
@@ -96,8 +99,8 @@ class AiManager(object):
             des pixels dans l'image, afin de pouvoir batir un modèle prédictif.
     """
 
-    def _getKMeans(self, pixels):
-        kms = KMeans(128, n_init=1, verbose=0)
+    def _getKMeans(self, pointsNb, pixels):
+        kms = KMeans(pointsNb, n_init=1, verbose=0)
         kms.fit(pixels)
 
         h = np.zeros((kms.n_clusters, ))
@@ -217,10 +220,9 @@ class AiManager(object):
         # Gestion de l'affichage sur la console
         if self._consts.getDisplayDetailedResults():
             print()
-            reversedPokedex = dataManager.getReversedPokedex()
             for pokemonId in sorted(results.keys()):
                 print("INFO => {} (\"{:03d}\"), prediction rate over {} test(s) = {:.2f}%".format(
-                    reversedPokedex[pokemonId], pokemonId, results[pokemonId]['success'] + results[pokemonId]['error'], results[pokemonId]['avg'] * 100))
+                    self._reversedPokedex[pokemonId], pokemonId, results[pokemonId]['success'] + results[pokemonId]['error'], results[pokemonId]['avg'] * 100))
 
         print()
         print("<=====================================>")
