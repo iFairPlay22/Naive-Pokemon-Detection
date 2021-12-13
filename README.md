@@ -15,36 +15,112 @@
 
 ### Notre projet
 
-Pokédex basé sur les images.
-Reconnaissance de pokémons à partir d'une image (à completer...).
+Le but de notre projet est de simuler le comportement d'un **pokédex**, mais à partir d'images. Ce dernier contient un algorithme de **machine learning**, fait en python, permettant de **reconnaitre un pokémon** à partir **d'une image**. 
+
+L'algorithme contient 2 parties principales :
+- **L'apprentissage** : 
+
+	> On calcule les **histogrammes de couleur** de chaque pokémon contenu dans des datasets d'apprentissage (`CompletePokemonImageDataset` et `PokemonGenerationOne`) ;
+- **La prédiction** :
+
+	> On lance une série de tests par **comparaison vectorielle** de diagrammes de couleurs entre les données d'apprentissage et le image du dataset de tests (`OneShotPokemon`) ;
 
 ### Datasets utilisés
 
-Informations sur les pokémons (ids, noms, descriptions, caractéristiques) :
- - [The Complete Pokemon Dataset](https://www.kaggle.com/rounakbanik/pokemon/version/1?select=pokemon.csv), Data on more than 800 Pokemon from all 7 Generations. ;
- - [Complete Pokemon Dataset](https://www.kaggle.com/mariotormo/complete-pokemon-dataset-updated-090420), Information about 1045 Pokemon (including varieties) until 8th Generation ;
+- Informations sur les pokémons (ids, noms, descriptions, caractéristiques) :
+
+	> [Complete Pokemon Dataset](https://www.kaggle.com/mariotormo/complete-pokemon-dataset-updated-090420), Information about 1045 Pokemon (including varieties) until 8th Generation ;
  
-Images de pokémons :
- - [Pokemon Generation One](https://www.kaggle.com/thedagger/pokemon-generation-one), Gotta train 'em all! ;
- - [Complete Pokemon Image Dataset](https://www.kaggle.com/hlrhegemony/pokemon-image-dataset), 2,500+ clean labeled images, all official art, for Generations 1 through 8. ;
- - [One-Shot-Pokemon Images](https://www.kaggle.com/aaronyin/oneshotpokemon), Colorful and fun dataset for one shot learning problem, gotta recognize them all ;
-> ( [Original 151 Pokemon Image Search Results](https://www.kaggle.com/brkurzawa/original-150-pokemon-image-search-results), A collection of images of the original 151 Pokemon obtained through Bing search )
+- Images de pokémons :
 
-## Structure 
+	> [Complete Pokemon Image Dataset](https://www.kaggle.com/hlrhegemony/pokemon-image-dataset), 2,500+ clean labeled images, all official art, for Generations 1 through 8. ;
+    
+	> [One-Shot-Pokemon Images](https://www.kaggle.com/aaronyin/oneshotpokemon), Colorful and fun dataset for one shot learning problem, gotta recognize them all ;
+    
+	> [Pokemon Generation One](https://www.kaggle.com/thedagger/pokemon-generation-one), Gotta train 'em all! ;
 
-L’organisation du projet :
+## Organisation du projet 
 
-> `/toto/1` : blablabla ;
+### Code du projet (`/code`)
 
-> `/toto/2` : blablabla ;
+Vous trouverez dans ce programme les différents codes python utilisés pour lancer l'algorithme de machine learning.
 
-> `/toto/3` : blablabla ;
+- `main.py` :
+
+	> Le programme principal à exécuter pour obtenir les résultats du traitement. Ce dernier utilise les classes définies dans les répertoires suivants.
+
+- `consts/__init__.py` :
+
+	> Définis une classe `ConstantsManager` permettant de gérer les paramètres du traitement comme le chemins d'accès aux fichiers, de gérer ce qui est affiché dans la console, etc.
+
+- `load/__init__.py` :
+
+	> Définis une classe `DataManager` permettant de charger en mémoire les données du csv (pokédex) et des différents datasets (images de pokemons) de manière uniforme.
+
+- `ai/__init__.py` :
+
+	> Définis une classe `AiManager` permettant de calculer les histogrammes de couleurs de chaque image de pokemon (apprentissage), et de trouver le nom du pokémon associé à une image de test (prédiction).
+
+### Ressources du projet (`/assets`)
+
+Afin de simplifier le traitement, nous avons organisé les ressources (csv et images) dans le répertoire de manière bien précise :
+
+- `/assets/csv/pokedex.csv` 
+
+	> Contient le CSV le plus récent fourni via Kaggle : [Complete Pokemon Dataset](https://www.kaggle.com/mariotormo/complete-pokemon-dataset-updated-090420/download) ;
+
+- `/assets/images/CompletePokemonImageDatatset/data/shapes/` 
+
+	> Contient toutes les images fournies via Kaggle : [Complete Pokemon Image Datatset](https://www.kaggle.com/hlrhegemony/pokemon-image-dataset/download) ;
+
+- `/assets/images/OneShotPokemon/data/shapes/` 
+
+	> Contient toutes les images (de pokemon standart) fournies via Kaggle : [One Shot Pokemon](https://www.kaggle.com/aaronyin/oneshotpokemon/download) ;
+
+- `/assets/images/PokemonGenerationOne/data/shapes/` 
+
+	> Contient toutes les images fournies via Kaggle : [Pokemon Generation One](https://www.kaggle.com/thedagger/pokemon-generation-one/download) ;
+
+- `/assets/images/OneShotPokemon/data/shapes/` 
+
+
+### Description du projet (`/notebook`)
+
+Vous trouverez dans ce répertoire le notebook (`.ipynb`) traitant des sujets suivants :
+- Etat de l'art ;
+
+	> Convolutional Neural Networks
+
+	> Regression Logistique
+
+	> K plus proche voisin
+
+- Description détaillée de la méthode utilisée ;
 
 ## Lancer le projet
 
+### Ressources
+
+Installer les ressources (csv et images) comment explicité dans la partie précédante.
+
+### Dépendances
+
+Installer les librairies : 
+- tqdm ;
+- numpy ; 
+- pandas ;
+- plotly ;
+- imageio ;
+- sklearn ; 
+- difflib ;
+
+### Execution
+
+Ouvrir un terminal et éxecuter les commandes suivantes : 
+
 ```bash
 cd ./WhosThatPokemon
-python3 ./toto/__init__.py
+python3 ./code/main.py
 ```
 
-Le 21/10/2021 à 11h30.
+Le 13/12/2021 à 12h20.
