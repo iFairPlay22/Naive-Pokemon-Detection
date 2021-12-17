@@ -99,17 +99,19 @@ Vous trouverez dans ce répertoire le notebook (`.ipynb`) traitant des sujets su
 
 ## Lancer le projet
 
-### Ressources
+### Inclure les images
 
-Installer les ressources (csv et images) comment explicité dans la partie précédante.
+Télécahrgez les images via ce [lien We-transfer]().
+
+Placez le dossier téléchargé et décompressé dans le dossier `assets` et assurez vous que ce dossier est correctement nommé `images`.
 
 ### Dépendances
 
 Installer les librairies : 
 - tqdm ;
-- numpy ; 
+- numpy : `pip install numpy` OR `conda install numpy`
 - pandas ;
-- plotly ;
+- plotly : `conda install -c plotly plotly` OR `pip install plotly`
 - imageio ;
 - sklearn ; 
 - difflib ;
