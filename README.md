@@ -23,7 +23,7 @@ L'algorithme contient 2 parties principales :
 	> On calcule les **histogrammes de couleur** de chaque pokémon contenu dans des datasets d'apprentissage (`CompletePokemonImageDataset` et `PokemonGenerationOne`) ;
 - **La prédiction** :
 
-	> On lance une série de tests par **comparaison vectorielle** de diagrammes de couleurs entre les données d'apprentissage et le image du dataset de tests (`OneShotPokemon`) ;
+	> On lance une série de tests par **comparaison vectorielle** de diagrammes de couleurs entre les données d'apprentissage et les images du dataset de test (`OneShotPokemon`) ;
 
 ### Datasets utilisés
 
@@ -37,7 +37,7 @@ L'algorithme contient 2 parties principales :
     
 	> [One-Shot-Pokemon Images](https://www.kaggle.com/aaronyin/oneshotpokemon), Colorful and fun dataset for one shot learning problem, gotta recognize them all ;
     
-	> [Pokemon Generation One](https://www.kaggle.com/thedagger/pokemon-generation-one), Gotta train 'em all! ;
+	> [Pokemon Generation One](https://www.kaggle.com/thedagger/pokemon-generation-one), Gotta train them all! ;
 
 ## Organisation du projet 
 
@@ -89,11 +89,11 @@ Afin de simplifier le traitement, nous avons organisé les ressources (csv et im
 Vous trouverez dans ce répertoire le notebook (`.ipynb`) traitant des sujets suivants :
 - Etat de l'art ;
 
-	> Convolutional Neural Networks
+	> Convolutional Neural Networks ;
 
-	> Regression Logistique
+	> Regression Logistique ;
 
-	> K plus proche voisin
+	> K plus proches voisins ;
 
 - Description détaillée de la méthode utilisée ;
 
@@ -101,17 +101,18 @@ Vous trouverez dans ce répertoire le notebook (`.ipynb`) traitant des sujets su
 
 ### Inclure les images
 
-Télécahrgez les images via ce [lien We-transfer]().
-
-Placez le dossier téléchargé et décompressé dans le dossier `assets` et assurez vous que ce dossier est correctement nommé `images`.
+Téléchargez les images des datasets et collez les dans les 3 répertoires suivants :
+- `./assets/images/CompletePokemonImageDataset/data/shapes` ;
+- `./assets/images/OneShotPokemon/data/shapes` ;
+- `./assets/images/PokemonGenerationOne/data/shapes` ;
 
 ### Dépendances
 
 Installer les librairies : 
 - tqdm ;
-- numpy : `pip install numpy` OR `conda install numpy`
+- numpy ;
 - pandas ;
-- plotly : `conda install -c plotly plotly` OR `pip install plotly`
+- plotly ;
 - imageio ;
 - sklearn ; 
 - difflib ;
@@ -125,4 +126,4 @@ cd ./WhosThatPokemon
 python3 ./code/main.py
 ```
 
-Le 13/12/2021 à 12h20.
+Le 02/01/2022.
