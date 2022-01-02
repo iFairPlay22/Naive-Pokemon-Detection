@@ -33,7 +33,7 @@ L'algorithme contient 2 parties principales :
  
 - Images de pokémons :
 
-	> [Complete Pokemon Image Dataset](https://www.kaggle.com/hlrhegemony/pokemon-image-dataset), 2,500+ clean labeled images, all official art, for Generations 1 through 8. ;
+	> [Complete Pokemon Image Dataset](https://www.kaggle.com/hlrhegemony/pokemon-image-dataset), 2,500+ clean labeled images, all official art, for Generations 1 through 8 ;
     
 	> [One-Shot-Pokemon Images](https://www.kaggle.com/aaronyin/oneshotpokemon), Colorful and fun dataset for one shot learning problem, gotta recognize them all ;
     
@@ -75,7 +75,7 @@ Afin de simplifier le traitement, nous avons organisé les ressources (csv et im
 
 - `/assets/images/OneShotPokemon/data/shapes/` 
 
-	> Contient toutes les images (de pokemon standart) fournies via Kaggle : [One Shot Pokemon](https://www.kaggle.com/aaronyin/oneshotpokemon/download) ;
+	> Contient toutes les images (de pokemon standard) fournies via Kaggle : [One Shot Pokemon](https://www.kaggle.com/aaronyin/oneshotpokemon/download) ;
 
 - `/assets/images/PokemonGenerationOne/data/shapes/` 
 
